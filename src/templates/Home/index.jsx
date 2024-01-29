@@ -3,6 +3,7 @@ import Posts from '../../components/Posts';
 import Button from '../../components/Button';
 import './styles.css'
 import { loadPosts } from '../../utils/load-posts';
+import TextInput from '../../components/TextInput';
 
 class Home extends Component {
   state = {
@@ -47,18 +48,32 @@ class Home extends Component {
 
   render() {
     const { posts, page, postsPerPage, allPosts, searchValue } = this.state
-    const noMorePosts = page + postsPerPage >= allPosts.length;
+    const noMorePosts = page + postsPerPage >= allPosts.length
+    const filterPosts = !!searchValue ? 
+      allPosts.filter(post => {
+        return post.title.toLowerCase().includes(searchValue.toLowerCase())
+      })
+      : posts
     return (
       <section className='container'>
-        <input type='search' value={searchValue} onChange={this.handleChange}/>
-        <h1>Search Value: {searchValue}</h1>
-        <Posts posts={posts} />
+        <div className='search-container'>
+          <TextInput searchValue={searchValue} handleChange={this.handleChange}/>
+          {!!searchValue && <h1>Search Value: {searchValue}</h1>}
+        </div>
+        {filterPosts.length > 0 && (
+          <Posts posts={filterPosts} />
+        )}
+        {filterPosts.length === 0 && (
+          <p>Não existem posts</p>
+        )}
         <div className='button-container'>
-          <Button 
-            onClick={this.loadMorePosts} 
-            text='Load more Posts' 
-            disabled={noMorePosts}
-          />
+          {!searchValue && (
+            <Button 
+              onClick={this.loadMorePosts} 
+              text='Load more Posts' 
+              disabled={noMorePosts}
+            />
+          )}
         </div>
       </section>
     )
